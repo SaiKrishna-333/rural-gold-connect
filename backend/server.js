@@ -17,9 +17,16 @@ const PORT = process.env.PORT || 3000;
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/ruralgoldconnect', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+  serverSelectionTimeoutMS: 5000,
+}).catch(err => {
+  console.error('MongoDB connection failed:', err.message);
+  console.log('Server will continue to run without database connection');
 });
+
 const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+db.on('error', (err) => {
+  console.error('MongoDB connection error:', err.message);
+});
 db.once('open', () => console.log('Connected to MongoDB'));
 
 // Middleware
