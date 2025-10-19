@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { GlassCard } from '@/components/ui/glass-card';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
-import { Sparkles, User, Mail, Lock, Wallet, ArrowLeft } from 'lucide-react';
+import { Sparkles, User, Mail, Lock, Wallet, ArrowLeft, Phone } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 
@@ -15,20 +15,23 @@ const Signup = () => {
     email: '',
     password: '',
     confirmPassword: '',
+    phone: '',
+    role: 'Borrower',
+    aadharNumber: '',
     walletAddress: '',
   });
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
   const navigate = useNavigate();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.fullName || !formData.email || !formData.password || !formData.confirmPassword || !formData.walletAddress) {
+    if (!formData.fullName || !formData.email || !formData.password || !formData.phone || !formData.role || !formData.aadharNumber) {
       toast.error('Please fill in all fields');
       return;
     }
@@ -38,17 +41,15 @@ const Signup = () => {
       return;
     }
 
-    if (formData.password.length < 8) {
-      toast.error('Password must be at least 8 characters');
-      return;
-    }
-
     setLoading(true);
     const success = await register({
       fullName: formData.fullName,
       email: formData.email,
       password: formData.password,
-      walletAddress: formData.walletAddress,
+      phone: formData.phone,
+      role: formData.role,
+      aadharNumber: formData.aadharNumber,
+      walletAddress: formData.walletAddress || 'dummy',
     });
     setLoading(false);
 
@@ -59,7 +60,6 @@ const Signup = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
-      {/* Background Effects */}
       <div className="absolute inset-0">
         <div className="absolute w-96 h-96 bg-gold/10 rounded-full blur-3xl top-0 right-0 animate-float" />
         <div className="absolute w-96 h-96 bg-gold/5 rounded-full blur-3xl bottom-0 left-0 animate-float" style={{ animationDelay: '2s' }} />
@@ -120,18 +120,60 @@ const Signup = () => {
             </div>
 
             <div className="space-y-2">
+              <Label htmlFor="phone" className="flex items-center gap-2">
+                <Phone className="w-4 h-4 text-gold" />
+                Phone Number
+              </Label>
+              <Input
+                id="phone"
+                name="phone"
+                placeholder="1234567890"
+                value={formData.phone}
+                onChange={handleChange}
+                className="glass-panel border-glass-border focus:border-gold"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="role">Role</Label>
+              <select
+                name="role"
+                value={formData.role}
+                onChange={handleChange}
+                className="w-full p-3 glass-panel border-glass-border focus:border-gold rounded-lg"
+                required
+              >
+                <option value="Borrower">Borrower</option>
+                <option value="Lender">Lender</option>
+              </select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="aadharNumber">Aadhar Number</Label>
+              <Input
+                id="aadharNumber"
+                name="aadharNumber"
+                placeholder="1234 5678 9012"
+                value={formData.aadharNumber}
+                onChange={handleChange}
+                className="glass-panel border-glass-border focus:border-gold"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor="walletAddress" className="flex items-center gap-2">
                 <Wallet className="w-4 h-4 text-gold" />
-                Wallet Address
+                Wallet Address (Optional)
               </Label>
               <Input
                 id="walletAddress"
                 name="walletAddress"
-                placeholder="0x..."
+                placeholder="0x... or dummy"
                 value={formData.walletAddress}
                 onChange={handleChange}
                 className="glass-panel border-glass-border focus:border-gold font-mono"
-                required
               />
             </div>
 
